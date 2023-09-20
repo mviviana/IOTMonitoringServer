@@ -66,7 +66,7 @@ def alert_data():
     print("Calculando alertas...")
 
     data = Data.objects.filter(
-        base_time__gte=datetime.now() - timedelta(minutes=5))
+        base_time__gte=datetime.now() - timedelta(minutes=1))
     aggregation = data.annotate(check_value=Avg('avg_value')) \
         .select_related('station', 'measurement') \
         .select_related('station__user', 'station__location') \
