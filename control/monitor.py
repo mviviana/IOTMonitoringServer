@@ -100,7 +100,7 @@ def alert_data():
             alerts_count = 0
 
     print(len(aggregation), "dispositivos revisados al contar alarmas")
-   
+    print(alerts_count, "contador de alarmas")
 
 def on_connect(client, userdata, flags, rc):
     '''
