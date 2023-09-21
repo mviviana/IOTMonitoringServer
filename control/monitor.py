@@ -63,7 +63,7 @@ def alert_data():
     # Consulta todos los datos de la última hora, los agrupa por estación y variable
     # Compara el promedio con los valores límite que definifmos.
     # Si el promedio se excede de los límites, se envia un mensaje de alerta.
-
+    global alerts_count 
     data = Data.objects.filter(
         base_time__gte=datetime.now() - timedelta(hours=1))
     aggregation = data.annotate(check_value=Avg('avg_value')) \
@@ -78,7 +78,6 @@ def alert_data():
                 'station__location__city__name',
                 'station__location__state__name',
                 'station__location__country__name')
-    alerts = 0
     for item in aggregation:
 
         variable = item["measurement__name"]
