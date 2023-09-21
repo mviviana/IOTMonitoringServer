@@ -97,7 +97,6 @@ def alert_data():
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
-            alerts_count = 0
 
     print(len(aggregation), "dispositivos revisados al contar alarmas")
     print(alerts_count, "contador de alarmas")
