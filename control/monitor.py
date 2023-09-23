@@ -97,13 +97,13 @@ def alert_data():
         if item["measurement__name"]=="temperatura" and item["check_value"] > max_value or item["check_value"] < min_value:
             alerts_count_t+=1
 
-        if alerts_count_t%3==0 and item["measurement__name"]=="temperatura":
-            message = "ALERTA TRES ALERTAS CONSECUTIVAS {}".format(variable)
+        if alerts_count_t%3==0:
+            message = "ALERTA TRES ALERTAS CONSECUTIVAS TEMPERATURA"
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
         if alerts_count_h%4==0 and item["measurement__name"]=="humedad":
-            message = "ALERTA CUATRO ALERTAS CONSECUTIVAS {}".format(variable)
+            message = "ALERTA CUATRO ALERTAS CONSECUTIVAS HUMEDAD"
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
@@ -160,7 +160,7 @@ def start_cron():
     '''
     print("Iniciando cron...")
     schedule.every(5).minutes.do(analyze_data)
-    schedule.every(90).seconds.do(alert_data)
+    schedule.every(30).seconds.do(alert_data)
     print("Servicio de control iniciado")
     while 1:
         schedule.run_pending()
