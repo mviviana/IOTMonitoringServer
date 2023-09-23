@@ -98,12 +98,12 @@ def alert_data():
             alerts_count_t+=1
 
         if alerts_count_t%3==0:
-            message = "ALERT CONTADOR {} {} {}".format(variable, min_value, max_value)
+            message = "ALERTA TRES ALERTAS CONSECUTIVAS {}".format(variable)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
         if alerts_count_h%4==0:
-            message = "ALERT CONTADOR {} {} {}".format(variable, min_value, max_value)
+            message = "ALERTA CUATRO ALERTAS CONSECUTIVAS {}".format(variable)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
