@@ -97,12 +97,12 @@ def alert_data():
         if item["measurement__name"]=="temperatura" and item["check_value"] > max_value or item["check_value"] < min_value:
             alerts_count_t+=1
 
-        if alerts_count_t%3==0:
+        if alerts_count_t%3==0 and item["measurement__name"]=="temperatura":
             message = "ALERTA TRES ALERTAS CONSECUTIVAS {}".format(variable)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
-        if alerts_count_h%4==0:
+        if alerts_count_h%4==0 and item["measurement__name"]=="humedad":
             message = "ALERTA CUATRO ALERTAS CONSECUTIVAS {}".format(variable)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
