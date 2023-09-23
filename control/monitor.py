@@ -9,7 +9,8 @@ import time
 from django.conf import settings
 
 client = mqtt.Client(settings.MQTT_USER_PUB)
-alerts_count = 0
+alerts_count_h = 0
+alerts_count_t = 0
 
 def analyze_data():
     # Consulta todos los datos de la última hora, los agrupa por estación y variable
@@ -62,8 +63,9 @@ def analyze_data():
 def alert_data():
     # Consulta todos los datos de la última hora, los agrupa por estación y variable
     # Compara el promedio con los valores límite que definifmos.
-    # Si el promedio se excede de los límites, se envia un mensaje de alerta.
-    global alerts_count 
+    # Si el promedio se excede de los límites, contabiliza las alertas y envia una alerta si excede limites.
+    global alerts_count_h
+    global alerts_count_t
     data = Data.objects.filter(
         base_time__gte=datetime.now() - timedelta(hours=1))
     aggregation = data.annotate(check_value=Avg('avg_value')) \
@@ -89,17 +91,27 @@ def alert_data():
         city = item['station__location__city__name']
         user = item['station__user__username']
 
-        if item["check_value"] > max_value or item["check_value"] < min_value:
-            alerts_count+=1
+        if item["measurement__name"]=="humedad" and item["check_value"] > max_value or item["check_value"] < min_value:
+            alerts_count_h+=1
 
-        if alerts_count>3:
+        if item["measurement__name"]=="temperatura" and item["check_value"] > max_value or item["check_value"] < min_value:
+            alerts_count_t+=1
+
+        if alerts_count_t%3==0:
+            message = "ALERT CONTADOR {} {} {}".format(variable, min_value, max_value)
+            topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
+            print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
+            client.publish(topic, message)
+        if alerts_count_h%4==0:
             message = "ALERT CONTADOR {} {} {}".format(variable, min_value, max_value)
             topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
 
     print(len(aggregation), "dispositivos revisados al contar alarmas")
-    print(alerts_count, "contador de alarmas")
+    print(alerts_count_h, "contador de alarmas humedad")
+    print(alerts_count_t, "contador de alarmas temperatura")
+    
 
 def on_connect(client, userdata, flags, rc):
     '''
@@ -148,7 +160,7 @@ def start_cron():
     '''
     print("Iniciando cron...")
     schedule.every(5).minutes.do(analyze_data)
-    schedule.every(1).minutes.do(alert_data)
+    schedule.every(90).seconds.do(alert_data)
     print("Servicio de control iniciado")
     while 1:
         schedule.run_pending()
